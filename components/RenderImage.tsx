@@ -1,34 +1,25 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   View,
-  Image,
   StyleSheet,
   ImageProps,
   StyleProp,
   ImageStyle,
 } from "react-native";
+import { Image } from "expo-image";
 
 interface RenderImageProps extends Omit<ImageProps, "source"> {
   image: string;
   style?: StyleProp<ImageStyle>;
 }
 
-const RenderImage: React.FC<RenderImageProps> = ({ image, style, ...rest }) => {
-  const [aspectRatio, setAspectRatio] = useState(1);
-
-  useEffect(() => {
-    Image.getSize(image, (width, height) => {
-      setAspectRatio(width / height);
-    });
-  }, [image]);
-
+const RenderImage: React.FC<RenderImageProps> = ({ image, style }) => {
   return (
     <View style={styles.container}>
       <Image
-        source={{ uri: image }}
-        style={[styles.image, { aspectRatio }, style]}
-        resizeMode="contain"
-        {...rest}
+        source={image}
+        style={[styles.image, style]}
+        contentFit="contain"
       />
     </View>
   );
@@ -43,6 +34,7 @@ const styles = StyleSheet.create({
   image: {
     width: "100%",
     height: undefined,
+    aspectRatio: 1.77,
   },
 });
 
