@@ -28,7 +28,7 @@ export const CHAT_DATA = {
       name: "Bob",
       message: "Sure, here it is!",
       image:
-        "https://static.vecteezy.com/system/resources/thumbnails/024/833/535/original/time-lapse-of-taj-mahal-an-ivory-white-marble-mausoleum-on-the-south-bank-of-the-yamuna-river-in-agra-uttar-pradesh-india-video.jpg",
+        "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcThpgl9Qzxa7N6mUmHGRo2caSfFPMfLorIc7OSs3WEVHNgcF9P_",
       reaction: ["🌟"],
     },
     {
