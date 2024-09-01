@@ -1,51 +1,66 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { AntDesign, Entypo, Feather, Ionicons } from "@expo/vector-icons";
+import Animated, {
+  FadeIn,
+  FadeInDown,
+  FadeOut,
+  FadeOutDown,
+  LinearTransition,
+} from "react-native-reanimated";
+import { useTheme } from "@react-navigation/native";
 
-const MENU_DATA = [
-  {
-    id: "0",
-    title: "Reply",
-    icon: <Entypo name="reply" size={24} color="black" />,
-  },
-  {
-    id: "1",
-    title: "Forward",
-    icon: <Entypo name="forward" size={24} color="black" />,
-  },
-  {
-    id: "2",
-    title: "Save",
-    icon: <Feather name="download" size={24} color="black" />,
-  },
-  {
-    id: "3",
-    title: "Select",
-    icon: <AntDesign name="checkcircleo" size={24} color="black" />,
-  },
-  {
-    id: "4",
-    title: "Info",
-    icon: <AntDesign name="infocirlceo" size={24} color="black" />,
-  },
-  {
-    id: "5",
-    title: "Delete",
-    icon: <Ionicons name="trash-outline" size={24} color="black" />,
-  },
-];
+const generateMenuData = (theme) => {
+  let color = theme.colors.text;
+  return [
+    {
+      id: "0",
+      title: "Reply",
+      icon: <Entypo name="reply" size={18} color={color} />,
+    },
+    {
+      id: "1",
+      title: "Forward",
+      icon: <Entypo name="forward" size={18} color={color} />,
+    },
+    {
+      id: "2",
+      title: "Save",
+      icon: <Feather name="download" size={18} color={color} />,
+    },
+    {
+      id: "3",
+      title: "Select",
+      icon: <AntDesign name="checkcircleo" size={18} color={color} />,
+    },
+    {
+      id: "4",
+      title: "Info",
+      icon: <AntDesign name="infocirlceo" size={18} color={color} />,
+    },
+    {
+      id: "5",
+      title: "Delete",
+      icon: <Ionicons name="trash-outline" size={18} color={color} />,
+    },
+  ];
+};
 
 const ChatMenu = () => {
+  const theme = useTheme();
+  const MENU_DATA = generateMenuData(theme);
   return (
-    <View
-      onLayout={(e) => console.log("EmojiBar", e.nativeEvent.layout.height)}
+    <Animated.View
+      entering={FadeInDown}
+      exiting={FadeOutDown}
+      layout={LinearTransition}
       style={{
-        minWidth: 200,
+        minWidth: 180,
         paddingVertical: 12,
         paddingHorizontal: 15,
-        backgroundColor: "white",
+        backgroundColor: theme.colors.menu,
         gap: 20,
-        borderRadius: 20,
+        borderRadius: 12,
         justifyContent: "center",
       }}
     >
@@ -54,7 +69,7 @@ const ChatMenu = () => {
           key={menu.id}
           style={{
             flexDirection: "row",
-            gap: 18,
+            gap: 20,
             alignContent: "center",
           }}
         >
@@ -63,13 +78,14 @@ const ChatMenu = () => {
             style={{
               fontSize: 15,
               lineHeight: 20,
+              color: theme.colors.text,
             }}
           >
             {menu.title}
           </Text>
         </View>
       ))}
-    </View>
+    </Animated.View>
   );
 };
 

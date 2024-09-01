@@ -1,19 +1,20 @@
-import React, { useState, forwardRef, useEffect } from "react";
+import React, { useState, forwardRef } from "react";
 import {
   View,
   Modal,
   StyleSheet,
   TouchableWithoutFeedback,
-  Pressable,
   useWindowDimensions,
 } from "react-native";
 import Animated, {
   useDerivedValue,
   measure,
   runOnJS,
-  LinearTransition,
+  useAnimatedStyle,
+  withSpring,
 } from "react-native-reanimated";
-import EmojiBar from "./EmojiBar";
+import { useHeaderHeight } from "@react-navigation/elements";
+import { useTheme } from "@react-navigation/native";
 
 interface ModalWrapperProps {
   isVisible: boolean;
@@ -21,13 +22,23 @@ interface ModalWrapperProps {
   children: React.ReactNode;
 }
 
-const EMOJI_BAR_HEIGHT = 56.76;
-const CHAT_MENU_HEIGHT = 270.85;
+const EXTRA_SPACE = 20;
 
 const ModalWrapper = forwardRef<Animated.View, ModalWrapperProps>(
-  ({ isVisible, onClose, children }, ref) => {
+  (
+    {
+      isVisible,
+      onClose,
+      children,
+      emojiBarHeight,
+      chatMenuHeight,
+      reactionMenuHeight,
+    },
+    ref
+  ) => {
+    const headerHeight = useHeaderHeight();
     const { width: WIDTH, height: HEIGHT } = useWindowDimensions();
-    const [isBottom, setIsBottom] = useState(false);
+
     const [modalPosition, setModalPosition] = useState({
       top: 0,
       left: 0,
@@ -40,11 +51,10 @@ const ModalWrapper = forwardRef<Animated.View, ModalWrapperProps>(
       left: 0,
     });
 
-    const settingNewPosition = (pageX, height) => {
+    const settingNewPosition = (pageX, top) => {
       setTimeout(() => {
         setNewPosition({
-          top: HEIGHT - CHAT_MENU_HEIGHT + 20 - height - EMOJI_BAR_HEIGHT,
-          left: pageX,
+          top,
         });
       }, 100);
     };
@@ -54,20 +64,36 @@ const ModalWrapper = forwardRef<Animated.View, ModalWrapperProps>(
       if (measured !== null) {
         const { width, height, pageX, pageY } = measured;
         runOnJS(setModalPosition)({ top: pageY, left: pageX, width, height });
-        // if (pageY < EMOJI_BAR_HEIGHT + 10) {
-        //   console.log("top");
-        //   runOnJS(setNewPosition)({
-        //     top: EMOJI_BAR_HEIGHT + 10,
-        //     left: pageX,
-        //   });
-        // }
-        if (pageY > HEIGHT - CHAT_MENU_HEIGHT + 20) {
-          runOnJS(settingNewPosition)(pageX, height);
+        const top = HEIGHT - reactionMenuHeight;
+
+        if (pageY - emojiBarHeight - 10 < headerHeight) {
+          runOnJS(settingNewPosition)(
+            pageX,
+            headerHeight + emojiBarHeight + 10
+          );
+        }
+        if (pageY > top) {
+          runOnJS(settingNewPosition)(pageX, top - EXTRA_SPACE);
         }
       } else {
-        console.log("measure: could not measure view");
+        // console.log("measure: could not measure view");
       }
     });
+
+    const animatedPositionStyle = useAnimatedStyle(() => {
+      return {
+        top:
+          newPostion.top !== 0
+            ? withSpring(newPostion.top, {
+                mass: 1,
+                stiffness: 150,
+                damping: 15,
+              })
+            : modalPosition.top,
+      };
+    });
+
+    const theme = useTheme();
 
     return (
       <Modal
@@ -78,17 +104,13 @@ const ModalWrapper = forwardRef<Animated.View, ModalWrapperProps>(
         animationType="fade"
       >
         <TouchableWithoutFeedback onPress={onClose}>
-          <View style={styles.overlay} />
+          <View
+            style={[styles.overlay, { backgroundColor: "rgba(20,20,20,0.9)" }]}
+          />
         </TouchableWithoutFeedback>
 
         <Animated.View
-          layout={newPostion.top !== 0 ? LinearTransition : undefined}
-          style={[
-            styles.modalContent,
-            modalPosition,
-            newPostion.top !== 0 ? newPostion : {},
-          ]}
-          // onPress={onClose}
+          style={[styles.modalContent, modalPosition, animatedPositionStyle]}
         >
           {children}
         </Animated.View>
@@ -100,7 +122,6 @@ const ModalWrapper = forwardRef<Animated.View, ModalWrapperProps>(
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.7)",
   },
   modalContent: {
     position: "absolute",
