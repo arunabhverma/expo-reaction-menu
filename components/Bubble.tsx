@@ -3,57 +3,62 @@ import React from "react";
 import { useTheme } from "@react-navigation/native";
 import RenderImage from "./RenderImage";
 import { TouchableWithoutFeedback } from "react-native-gesture-handler";
+import Button from "./Button";
 
 const Bubble = ({ setIsMenuOpen, isEven, item }) => {
   const theme = useTheme();
   return (
-    <TouchableWithoutFeedback
+    <Button
       onPress={() => setIsMenuOpen(true)}
       style={[
         styles.chatBubble,
         {
-          backgroundColor: isEven ? "rgb(230,230,230)" : theme.colors.primary,
+          backgroundColor: isEven
+            ? theme.colors.secondary
+            : theme.colors.primary,
         },
       ]}
     >
       <>
         {item.image && (
-          <RenderImage image={item.image} style={{ borderRadius: 18 }} />
+          <RenderImage image={item.image} style={{ borderRadius: 10 }} />
         )}
         <Text
           style={[
             styles.chatText,
             {
-              paddingVertical: 7,
-              paddingLeft: isEven ? 17 : 12,
-              paddingRight: isEven ? 12 : 17,
+              paddingVertical: 5,
+              paddingHorizontal: 10,
             },
-            { color: isEven ? "black" : "white" },
+            { color: isEven ? theme.colors.text : "white" },
           ]}
         >
           {item.message}
         </Text>
         <View
-          style={[
-            styles.bubbleStyle,
-            {
-              backgroundColor: isEven
-                ? "rgb(230,230,230)"
-                : theme.colors.primary,
-              right: isEven ? "auto" : 2,
-              left: isEven ? 2 : "auto",
-
-              transform: [
-                { skewX: isEven ? "-30deg" : "30deg" },
-                { skewY: isEven ? "-30deg" : "30deg" },
-                { rotate: isEven ? "-15deg" : "15deg" },
-                { scaleX: -1 },
-              ],
-            },
-          ]}
+          style={{
+            position: "absolute",
+            width: 0,
+            height: 0,
+            backgroundColor: "transparent",
+            borderStyle: "solid",
+            borderLeftWidth: 10,
+            borderRightWidth: 10,
+            borderBottomWidth: 40,
+            borderLeftColor: "transparent",
+            borderRightColor: "transparent",
+            borderBottomColor: isEven
+              ? theme.colors.secondary
+              : theme.colors.primary,
+            transform: [{ rotateX: "110deg" }],
+            marginTop: -13,
+            left: isEven ? -6 : "auto",
+            right: isEven ? "auto" : -6,
+            zIndex: -1,
+          }}
         />
       </>
-    </TouchableWithoutFeedback>
+    </Button>
   );
 };
 
@@ -69,9 +74,9 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
     minHeight: 40,
     maxWidth: "60%",
-    borderRadius: 20,
-    justifyContent: "center",
-    padding: 3,
+    borderRadius: 12,
+    justifyContent: "flex-start",
+    padding: 2,
   },
   gradientStyle: {
     flex: 1,
@@ -90,7 +95,7 @@ const styles = StyleSheet.create({
   },
   chatText: {
     fontSize: 15,
-    fontWeight: "500",
+    // fontWeight: "500",
   },
   bottomGradientStyle: {
     position: "absolute",

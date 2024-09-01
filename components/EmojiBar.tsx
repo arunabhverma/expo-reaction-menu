@@ -1,6 +1,13 @@
 import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 import { Ionicons } from "@expo/vector-icons";
+import Animated, {
+  FadeInDown,
+  FadeInUp,
+  FadeOutUp,
+  LinearTransition,
+} from "react-native-reanimated";
+import { useTheme } from "@react-navigation/native";
 
 const EMOJI_DATA = [
   { id: "0", emoji: "❤️" },
@@ -11,23 +18,29 @@ const EMOJI_DATA = [
   { id: "5", emoji: "😢" },
 ];
 
-const EMOJI_HEIGHT = 28;
+const EMOJI_HEIGHT = 22;
 
-const EmojiBar = () => {
+const EmojiBar = ({ setEmojiBarHeight }) => {
+  const theme = useTheme();
   return (
-    <View
+    <Animated.View
+      onLayout={(e) => setEmojiBarHeight(e.nativeEvent.layout.height)}
       style={{
         flexDirection: "row",
-        paddingVertical: 8,
-        paddingHorizontal: 12,
-        backgroundColor: "white",
-        gap: 10,
+        paddingVertical: 5,
+        paddingHorizontal: 10,
+        backgroundColor: theme.colors.menu,
+        gap: 8,
         borderRadius: 200,
         alignItems: "center",
       }}
     >
       {EMOJI_DATA.map((emoji) => (
-        <View key={emoji.id} style={{}}>
+        <Animated.View
+          entering={FadeInDown.delay(50)}
+          key={emoji.id}
+          style={{}}
+        >
           <Text
             style={{
               fontSize: EMOJI_HEIGHT,
@@ -36,14 +49,16 @@ const EmojiBar = () => {
           >
             {emoji.emoji}
           </Text>
-        </View>
+        </Animated.View>
       ))}
-      <Ionicons
-        name="ellipsis-horizontal-circle-sharp"
-        size={EMOJI_HEIGHT + 12}
-        color="darkgray"
-      />
-    </View>
+      <Animated.View entering={FadeInDown.delay(100)}>
+        <Ionicons
+          name="ellipsis-horizontal-circle-sharp"
+          size={EMOJI_HEIGHT + 12}
+          color={"rgb(100,100,100)"}
+        />
+      </Animated.View>
+    </Animated.View>
   );
 };
 
