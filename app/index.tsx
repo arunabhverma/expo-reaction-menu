@@ -28,7 +28,6 @@ const RenderItem = ({ item }) => {
     <Animated.View
       ref={ChatItemRef}
       style={{
-        padding: 1,
         alignItems: isEven ? "flex-start" : "flex-end",
       }}
     >

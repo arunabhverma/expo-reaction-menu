@@ -1,14 +1,10 @@
 import React, { forwardRef, useState } from "react";
-import { View } from "react-native";
 import ModalWrapper from "./ReactionMenuWrapper";
 import Animated, {
   FadeIn,
   FadeInDown,
-  FadeInUp,
-  FadeOut,
   LinearTransition,
-  ZoomInEasyDown,
-  ZoomInEasyUp,
+  ZoomIn,
 } from "react-native-reanimated";
 import Bubble from "./Bubble";
 import EmojiBar from "./EmojiBar";
@@ -62,7 +58,12 @@ const ReactionMenu = forwardRef<Animated.View, ReactionMenuType>(
               />
             </Animated.View>
           )}
-          <Bubble {...bubbleData} />
+          <Animated.View
+            // entering={ZoomIn}
+            style={{ transform: [{ scale: 1.1 }] }}
+          >
+            <Bubble {...bubbleData} />
+          </Animated.View>
           {isMenuOpen && (
             <Animated.View>
               <ChatMenu />
