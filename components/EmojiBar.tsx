@@ -35,9 +35,10 @@ const EmojiBar = ({ setEmojiBarHeight }) => {
         alignItems: "center",
       }}
     >
-      {EMOJI_DATA.map((emoji) => (
+      {EMOJI_DATA.map((emoji, i) => (
         <Animated.View
-          entering={FadeInDown.delay(50)}
+          layout={LinearTransition}
+          entering={FadeInDown.delay(i * 50)}
           key={emoji.id}
           style={{}}
         >
@@ -51,7 +52,10 @@ const EmojiBar = ({ setEmojiBarHeight }) => {
           </Text>
         </Animated.View>
       ))}
-      <Animated.View entering={FadeInDown.delay(100)}>
+      <Animated.View
+        layout={LinearTransition}
+        entering={FadeInDown.delay(EMOJI_DATA.length * 50)}
+      >
         <Ionicons
           name="ellipsis-horizontal-circle-sharp"
           size={EMOJI_HEIGHT + 12}

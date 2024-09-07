@@ -1,12 +1,10 @@
-import React, { forwardRef, useState } from "react";
-import ModalWrapper from "./ReactionMenuWrapper";
+import React, { forwardRef, useEffect, useState } from "react";
 import Animated, {
-  FadeIn,
   FadeInDown,
-  LinearTransition,
-  ZoomIn,
+  useSharedValue,
+  withTiming,
 } from "react-native-reanimated";
-import Bubble from "./Bubble";
+import ModalWrapper from "./ReactionMenuWrapper";
 import EmojiBar from "./EmojiBar";
 import ChatMenu from "./ChatMenu";
 
@@ -16,61 +14,62 @@ interface ReactionMenuType {
 }
 
 const ReactionMenu = forwardRef<Animated.View, ReactionMenuType>(
-  ({ isMenuOpen, setIsMenuOpen, bubbleData }, ref) => {
+  ({ isMenuOpen, setIsMenuOpen, bubbleData, children }, ref) => {
+    const scaleVal = useSharedValue(0);
     const [state, setState] = useState({
       emojiBarHeight: 0,
       reactionMenuHeight: 0,
     });
 
+    useEffect(() => {
+      scaleVal.value = withTiming(1.1);
+    }, []);
+
     if (!isMenuOpen) {
-      return;
+      return children;
     }
 
     return (
-      <ModalWrapper
-        ref={ref}
-        isVisible={isMenuOpen}
-        emojiBarHeight={state.emojiBarHeight}
-        reactionMenuHeight={state.reactionMenuHeight}
-        onClose={() => setIsMenuOpen(false)}
-      >
-        <Animated.View
-          onLayout={(e) => {
-            e.persist();
-            setState((prev) => ({
-              ...prev,
-              reactionMenuHeight: e?.nativeEvent?.layout?.height,
-            }));
-          }}
-          style={{
-            padding: 1,
-            alignItems: bubbleData.isEven ? "flex-start" : "flex-end",
-            gap: 15,
-            top: -state.emojiBarHeight - 15,
-          }}
+      <>
+        {children}
+        <ModalWrapper
+          ref={ref}
+          isVisible={isMenuOpen}
+          emojiBarHeight={state.emojiBarHeight}
+          reactionMenuHeight={state.reactionMenuHeight}
+          onClose={() => setIsMenuOpen(false)}
         >
-          {isMenuOpen && (
-            <Animated.View entering={FadeInDown}>
+          <Animated.View
+            onLayout={(e) => {
+              e.persist();
+              setState((prev) => ({
+                ...prev,
+                reactionMenuHeight: e?.nativeEvent?.layout?.height,
+              }));
+            }}
+            style={{
+              padding: 1,
+              alignItems: bubbleData.isEven ? "flex-start" : "flex-end",
+              gap: 15,
+              top: -state.emojiBarHeight - 15,
+            }}
+          >
+            {isMenuOpen && (
               <EmojiBar
                 setEmojiBarHeight={(e) =>
                   setState((prev) => ({ ...prev, emojiBarHeight: e }))
                 }
               />
-            </Animated.View>
-          )}
-          <Animated.View
-            // entering={ZoomIn}
-            style={{ transform: [{ scale: 1.1 }] }}
-          >
-            <Bubble {...bubbleData} />
+            )}
+            <Animated.View>{children}</Animated.View>
+            {isMenuOpen && (
+              <Animated.View>
+                <ChatMenu />
+              </Animated.View>
+            )}
           </Animated.View>
-          {isMenuOpen && (
-            <Animated.View>
-              <ChatMenu />
-            </Animated.View>
-          )}
-        </Animated.View>
-      </ModalWrapper>
+        </ModalWrapper>
+      </>
     );
   }
 );

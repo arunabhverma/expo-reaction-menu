@@ -4,11 +4,14 @@ import { AntDesign, Entypo, Feather, Ionicons } from "@expo/vector-icons";
 import Animated, {
   FadeIn,
   FadeInDown,
+  FadeInUp,
   FadeOut,
   FadeOutDown,
+  FadeOutUp,
   LinearTransition,
 } from "react-native-reanimated";
 import { useTheme } from "@react-navigation/native";
+import { BlurView } from "expo-blur";
 
 const generateMenuData = (theme) => {
   let color = theme.colors.text;
@@ -51,9 +54,9 @@ const ChatMenu = () => {
   const MENU_DATA = generateMenuData(theme);
   return (
     <Animated.View
-      entering={FadeInDown}
-      exiting={FadeOutDown}
-      layout={LinearTransition}
+      entering={FadeInUp.delay(200)}
+      exiting={FadeOutUp}
+      layout={LinearTransition.springify().damping(50).mass(4).stiffness(300)}
       style={{
         minWidth: 180,
         paddingVertical: 12,
@@ -65,8 +68,13 @@ const ChatMenu = () => {
         overflow: "hidden",
       }}
     >
-      {MENU_DATA.map((menu) => (
-        <View
+      {MENU_DATA.map((menu, i) => (
+        <Animated.View
+          layout={LinearTransition.springify()
+            .damping(50)
+            .mass(4)
+            .stiffness(300)}
+          entering={FadeInUp.delay(i * 50)}
           key={menu.id}
           style={{
             flexDirection: "row",
@@ -84,7 +92,7 @@ const ChatMenu = () => {
           >
             {menu.title}
           </Text>
-        </View>
+        </Animated.View>
       ))}
     </Animated.View>
   );

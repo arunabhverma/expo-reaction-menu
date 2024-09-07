@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { FlatList, StyleSheet } from "react-native";
-import { useTheme } from "@react-navigation/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { CHAT_DATA } from "@/mock/chatData";
 import { CHAT_ITEM } from "@/types";
@@ -18,7 +17,6 @@ interface RenderItemType {
 }
 
 const RenderItem = ({ item }) => {
-  const theme = useTheme();
   const isEven = item.userId == USER_ID;
 
   const ChatItemRef = useAnimatedRef<Animated.View>();
@@ -26,12 +24,12 @@ const RenderItem = ({ item }) => {
 
   return (
     <Animated.View
+      sharedTransitionTag="sharedTag"
       ref={ChatItemRef}
       style={{
         alignItems: isEven ? "flex-start" : "flex-end",
       }}
     >
-      <Bubble item={item} isEven={isEven} setIsMenuOpen={setIsMenuOpen} />
       <ReactionMenu
         ref={ChatItemRef}
         isMenuOpen={isMenuOpen}
@@ -41,7 +39,9 @@ const RenderItem = ({ item }) => {
           isEven,
           setIsMenuOpen,
         }}
-      />
+      >
+        <Bubble item={item} isEven={isEven} setIsMenuOpen={setIsMenuOpen} />
+      </ReactionMenu>
     </Animated.View>
   );
 };

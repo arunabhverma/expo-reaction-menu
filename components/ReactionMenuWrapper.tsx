@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TouchableWithoutFeedback,
   useWindowDimensions,
+  Platform,
 } from "react-native";
 import Animated, {
   useDerivedValue,
@@ -18,16 +19,17 @@ import Animated, {
   withDelay,
   useAnimatedReaction,
 } from "react-native-reanimated";
+import { BlurView } from "expo-blur";
+
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useTheme } from "@react-navigation/native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface ModalWrapperProps {
   isVisible: boolean;
   onClose: () => void;
   children: React.ReactNode;
 }
-
-const EXTRA_SPACE = 20;
 
 const ModalWrapper = forwardRef<Animated.View, ModalWrapperProps>(
   (
@@ -41,6 +43,11 @@ const ModalWrapper = forwardRef<Animated.View, ModalWrapperProps>(
     },
     ref
   ) => {
+    const { bottom, top } = useSafeAreaInsets();
+    const EXTRA_SPACE = Platform.select({
+      android: 20,
+      ios: 20 + bottom + top,
+    });
     const headerHeight = useHeaderHeight();
     const sharedModalPosition = useSharedValue({
       translateY: 0,
@@ -105,7 +112,7 @@ const ModalWrapper = forwardRef<Animated.View, ModalWrapperProps>(
             //   headerHeight + emojiBarHeight + 10
             // );
           }
-          if (pageY > top) {
+          if (pageY + EXTRA_SPACE > top) {
             console.log("top", top, pageY, -(pageY - top));
             // topPosition.value = top - EXTRA_SPACE;
             topPosition.value = -(pageY - top) - EXTRA_SPACE;
@@ -183,9 +190,23 @@ const ModalWrapper = forwardRef<Animated.View, ModalWrapperProps>(
         animationType="fade"
       >
         <TouchableWithoutFeedback onPressOut={onClose}>
-          <View
-            style={[styles.overlay, { backgroundColor: "rgba(20,20,20,0.9)" }]}
-          />
+          {Platform.OS === "android" ? (
+            <View
+              style={[
+                styles.overlay,
+                { backgroundColor: "rgba(20,20,20,0.9)" },
+              ]}
+            />
+          ) : (
+            <BlurView
+              style={[
+                StyleSheet.absoluteFillObject,
+                {
+                  backgroundColor: "rgba(20,20,20,0.8)",
+                },
+              ]}
+            />
+          )}
         </TouchableWithoutFeedback>
 
         <Animated.View
