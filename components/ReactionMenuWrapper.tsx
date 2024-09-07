@@ -103,7 +103,7 @@ const ModalWrapper = forwardRef<Animated.View, ModalWrapperProps>(
         statusBarTranslucent
         animationType="fade"
       >
-        <TouchableWithoutFeedback onPress={onClose}>
+        <TouchableWithoutFeedback onPressOut={onClose}>
           <View
             style={[styles.overlay, { backgroundColor: "rgba(20,20,20,0.9)" }]}
           />

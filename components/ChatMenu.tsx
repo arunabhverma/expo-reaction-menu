@@ -62,6 +62,7 @@ const ChatMenu = () => {
         gap: 20,
         borderRadius: 12,
         justifyContent: "center",
+        overflow: "hidden",
       }}
     >
       {MENU_DATA.map((menu) => (

@@ -2,7 +2,6 @@ import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 import { useTheme } from "@react-navigation/native";
 import RenderImage from "./RenderImage";
-import { TouchableWithoutFeedback } from "react-native-gesture-handler";
 import Button from "./Button";
 
 const Bubble = ({ setIsMenuOpen, isEven, item }) => {
@@ -94,8 +93,7 @@ const styles = StyleSheet.create({
     zIndex: -1,
   },
   chatText: {
-    fontSize: 15,
-    // fontWeight: "500",
+    fontSize: 16,
   },
   bottomGradientStyle: {
     position: "absolute",

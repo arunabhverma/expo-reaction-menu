@@ -32,10 +32,10 @@ export default function RootLayout() {
     colors: {
       ...DarkTheme.colors,
       background: "rgb(28,28,28)",
-      card: "rgb(48, 47, 46)",
+      card: "rgb(42, 42, 44)",
       primary: "rgb(43,140,246)",
       secondary: "rgb(52,52,54)",
-      menu: "rgb(61,61,61)",
+      menu: "rgb(42,42,44)",
     },
   };
   let light = {
