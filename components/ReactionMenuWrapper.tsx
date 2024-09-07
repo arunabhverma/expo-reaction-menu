@@ -1,99 +1,99 @@
-import React, { useState, forwardRef } from "react";
+import React, { forwardRef } from "react";
 import {
   View,
   Modal,
   StyleSheet,
   TouchableWithoutFeedback,
   useWindowDimensions,
+  Platform,
 } from "react-native";
 import Animated, {
-  useDerivedValue,
   measure,
-  runOnJS,
   useAnimatedStyle,
-  withSpring,
+  useSharedValue,
+  withTiming,
+  useAnimatedReaction,
 } from "react-native-reanimated";
+import { BlurView } from "expo-blur";
 import { useHeaderHeight } from "@react-navigation/elements";
-import { useTheme } from "@react-navigation/native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { ModalWrapperProps } from "@/types";
 
-interface ModalWrapperProps {
-  isVisible: boolean;
-  onClose: () => void;
-  children: React.ReactNode;
-}
-
-const EXTRA_SPACE = 20;
+const GAP = 20;
 
 const ModalWrapper = forwardRef<Animated.View, ModalWrapperProps>(
   (
-    {
-      isVisible,
-      onClose,
-      children,
-      emojiBarHeight,
-      chatMenuHeight,
-      reactionMenuHeight,
-    },
+    { isVisible, onClose, children, emojiBarHeight, reactionMenuHeight },
     ref
   ) => {
+    const { bottom } = useSafeAreaInsets();
+    const EXTRA_SPACE = Platform.select({
+      ios: bottom,
+      default: 20,
+    });
     const headerHeight = useHeaderHeight();
-    const { width: WIDTH, height: HEIGHT } = useWindowDimensions();
-
-    const [modalPosition, setModalPosition] = useState({
-      top: 0,
-      left: 0,
+    const sharedModalPosition = useSharedValue({
+      translateY: 0,
+      translateX: 0,
       width: 0,
       height: 0,
     });
+    const topPosition = useSharedValue(0);
+    const { height: HEIGHT } = useWindowDimensions();
 
-    const [newPostion, setNewPosition] = useState({
-      top: 0,
-      left: 0,
-    });
+    useAnimatedReaction(
+      () => {
+        const measured = measure(ref);
+        return measured;
+      },
+      (currentValue, previousValue) => {
+        if (currentValue !== previousValue) {
+          if (currentValue !== null) {
+            const { width, height, pageX, pageY } = currentValue;
+            sharedModalPosition.value = {
+              translateY: pageY,
+              translateX: pageX,
+              width,
+              height,
+            };
+            const top = HEIGHT - reactionMenuHeight;
 
-    const settingNewPosition = (pageX, top) => {
-      setTimeout(() => {
-        setNewPosition({
-          top,
-        });
-      }, 100);
-    };
-
-    useDerivedValue(() => {
-      const measured = measure(ref);
-      if (measured !== null) {
-        const { width, height, pageX, pageY } = measured;
-        runOnJS(setModalPosition)({ top: pageY, left: pageX, width, height });
-        const top = HEIGHT - reactionMenuHeight;
-
-        if (pageY - emojiBarHeight - 10 < headerHeight) {
-          runOnJS(settingNewPosition)(
-            pageX,
-            headerHeight + emojiBarHeight + 10
-          );
+            if (pageY - emojiBarHeight - GAP < headerHeight) {
+              topPosition.value = Math.abs(
+                pageY - (headerHeight + emojiBarHeight + GAP)
+              );
+            }
+            if (pageY + emojiBarHeight + GAP + EXTRA_SPACE > top) {
+              topPosition.value = -(
+                pageY -
+                top +
+                emojiBarHeight +
+                GAP +
+                EXTRA_SPACE
+              );
+            }
+          }
         }
-        if (pageY > top) {
-          runOnJS(settingNewPosition)(pageX, top - EXTRA_SPACE);
-        }
-      } else {
-        // console.log("measure: could not measure view");
       }
-    });
+    );
 
     const animatedPositionStyle = useAnimatedStyle(() => {
       return {
-        top:
-          newPostion.top !== 0
-            ? withSpring(newPostion.top, {
-                mass: 1,
-                stiffness: 150,
-                damping: 15,
-              })
-            : modalPosition.top,
+        width: sharedModalPosition.value.width,
+        height: sharedModalPosition.value.height,
+        transform: [
+          {
+            translateX: sharedModalPosition.value.translateX,
+          },
+          {
+            translateY: sharedModalPosition.value.translateY,
+          },
+          {
+            translateY: withTiming(topPosition.value),
+          },
+        ],
       };
     });
-
-    const theme = useTheme();
 
     return (
       <Modal
@@ -103,15 +103,15 @@ const ModalWrapper = forwardRef<Animated.View, ModalWrapperProps>(
         statusBarTranslucent
         animationType="fade"
       >
-        <TouchableWithoutFeedback onPress={onClose}>
-          <View
-            style={[styles.overlay, { backgroundColor: "rgba(20,20,20,0.9)" }]}
-          />
+        <TouchableWithoutFeedback onPressOut={onClose}>
+          {Platform.OS === "android" ? (
+            <View style={[styles.overlay, styles.bg]} />
+          ) : (
+            <BlurView style={[StyleSheet.absoluteFillObject, styles.bg]} />
+          )}
         </TouchableWithoutFeedback>
 
-        <Animated.View
-          style={[styles.modalContent, modalPosition, animatedPositionStyle]}
-        >
+        <Animated.View style={[styles.modalContent, animatedPositionStyle]}>
           {children}
         </Animated.View>
       </Modal>
@@ -128,6 +128,9 @@ const styles = StyleSheet.create({
     zIndex: 10,
     gap: 10,
     cursor: "auto",
+  },
+  bg: {
+    backgroundColor: "rgba(20,20,20,0.8)",
   },
 });
 
