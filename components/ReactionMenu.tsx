@@ -1,29 +1,19 @@
-import React, { forwardRef, useEffect, useState } from "react";
-import Animated, {
-  FadeInDown,
-  useSharedValue,
-  withTiming,
-} from "react-native-reanimated";
+import React, { forwardRef, useState } from "react";
+import { StyleSheet } from "react-native";
+import Animated from "react-native-reanimated";
 import ModalWrapper from "./ReactionMenuWrapper";
 import EmojiBar from "./EmojiBar";
 import ChatMenu from "./ChatMenu";
+import { ReactionMenuType } from "@/types";
 
-interface ReactionMenuType {
-  isMenuOpen: boolean;
-  setIsMenuOpen: (val: boolean) => void;
-}
+const GAP = 20;
 
 const ReactionMenu = forwardRef<Animated.View, ReactionMenuType>(
-  ({ isMenuOpen, setIsMenuOpen, bubbleData, children }, ref) => {
-    const scaleVal = useSharedValue(0);
+  ({ isMenuOpen, setIsMenuOpen, isEven, children }, ref) => {
     const [state, setState] = useState({
       emojiBarHeight: 0,
       reactionMenuHeight: 0,
     });
-
-    useEffect(() => {
-      scaleVal.value = withTiming(1.1);
-    }, []);
 
     if (!isMenuOpen) {
       return children;
@@ -42,17 +32,20 @@ const ReactionMenu = forwardRef<Animated.View, ReactionMenuType>(
           <Animated.View
             onLayout={(e) => {
               e.persist();
-              setState((prev) => ({
-                ...prev,
-                reactionMenuHeight: e?.nativeEvent?.layout?.height,
-              }));
+              if (isMenuOpen) {
+                setState((prev) => ({
+                  ...prev,
+                  reactionMenuHeight: e?.nativeEvent?.layout?.height,
+                }));
+              }
             }}
-            style={{
-              padding: 1,
-              alignItems: bubbleData.isEven ? "flex-start" : "flex-end",
-              gap: 15,
-              top: -state.emojiBarHeight - 15,
-            }}
+            style={[
+              styles.container,
+              {
+                alignItems: isEven ? "flex-start" : "flex-end",
+                top: -state.emojiBarHeight - GAP,
+              },
+            ]}
           >
             {isMenuOpen && (
               <EmojiBar
@@ -73,5 +66,12 @@ const ReactionMenu = forwardRef<Animated.View, ReactionMenuType>(
     );
   }
 );
+
+const styles = StyleSheet.create({
+  container: {
+    padding: 1,
+    gap: GAP,
+  },
+});
 
 export default ReactionMenu;

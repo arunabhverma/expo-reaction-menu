@@ -1,4 +1,4 @@
-import React, { useState, forwardRef } from "react";
+import React, { forwardRef } from "react";
 import {
   View,
   Modal,
@@ -8,45 +8,28 @@ import {
   Platform,
 } from "react-native";
 import Animated, {
-  useDerivedValue,
   measure,
-  runOnJS,
   useAnimatedStyle,
-  withSpring,
-  LinearTransition,
   useSharedValue,
   withTiming,
-  withDelay,
   useAnimatedReaction,
 } from "react-native-reanimated";
 import { BlurView } from "expo-blur";
-
 import { useHeaderHeight } from "@react-navigation/elements";
-import { useTheme } from "@react-navigation/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { ModalWrapperProps } from "@/types";
 
-interface ModalWrapperProps {
-  isVisible: boolean;
-  onClose: () => void;
-  children: React.ReactNode;
-}
+const GAP = 20;
 
 const ModalWrapper = forwardRef<Animated.View, ModalWrapperProps>(
   (
-    {
-      isVisible,
-      onClose,
-      children,
-      emojiBarHeight,
-      chatMenuHeight,
-      reactionMenuHeight,
-    },
+    { isVisible, onClose, children, emojiBarHeight, reactionMenuHeight },
     ref
   ) => {
-    const { bottom, top } = useSafeAreaInsets();
+    const { bottom } = useSafeAreaInsets();
     const EXTRA_SPACE = Platform.select({
-      android: 20,
-      ios: 20 + bottom + top,
+      ios: bottom,
+      default: 20,
     });
     const headerHeight = useHeaderHeight();
     const sharedModalPosition = useSharedValue({
@@ -56,27 +39,7 @@ const ModalWrapper = forwardRef<Animated.View, ModalWrapperProps>(
       height: 0,
     });
     const topPosition = useSharedValue(0);
-    const { width: WIDTH, height: HEIGHT } = useWindowDimensions();
-
-    const [modalPosition, setModalPosition] = useState({
-      top: 0,
-      left: 0,
-      width: 0,
-      height: 0,
-    });
-
-    const [newPostion, setNewPosition] = useState({
-      top: 0,
-      left: 0,
-    });
-
-    const settingNewPosition = (pageX, top) => {
-      setTimeout(() => {
-        setNewPosition({
-          top,
-        });
-      }, 100);
-    };
+    const { height: HEIGHT } = useWindowDimensions();
 
     useAnimatedReaction(
       () => {
@@ -85,82 +48,39 @@ const ModalWrapper = forwardRef<Animated.View, ModalWrapperProps>(
       },
       (currentValue, previousValue) => {
         if (currentValue !== previousValue) {
-          console.log("currentValue", currentValue);
+          if (currentValue !== null) {
+            const { width, height, pageX, pageY } = currentValue;
+            sharedModalPosition.value = {
+              translateY: pageY,
+              translateX: pageX,
+              width,
+              height,
+            };
+            const top = HEIGHT - reactionMenuHeight;
 
-          const { width, height, pageX, pageY } = currentValue;
-          sharedModalPosition.value = {
-            translateY: pageY,
-            translateX: pageX,
-            width,
-            height,
-          };
-          // topPosition.value = pageY;
-
-          const top = HEIGHT - reactionMenuHeight;
-
-          console.log("pageY", pageY, headerHeight);
-
-          if (pageY - emojiBarHeight - 10 < headerHeight) {
-            // sharedModalPosition.value.translateY = withTiming(
-            //   sharedModalPosition.value.translateY - 100
-            //   // headerHeight + emojiBarHeight + 10
-            // );
-            // topPosition.value = headerHeight + emojiBarHeight + 10;
-            topPosition.value = pageY - headerHeight + emojiBarHeight + 10;
-            // runOnJS(settingNewPosition)(
-            //   pageX,
-            //   headerHeight + emojiBarHeight + 10
-            // );
-          }
-          if (pageY + EXTRA_SPACE > top) {
-            console.log("top", top, pageY, -(pageY - top));
-            // topPosition.value = top - EXTRA_SPACE;
-            topPosition.value = -(pageY - top) - EXTRA_SPACE;
-            // sharedModalPosition.value.translateY = withTiming(
-            //   top - EXTRA_SPACE
-            // );
-            // runOnJS(settingNewPosition)(pageX, top - EXTRA_SPACE);
+            if (pageY - emojiBarHeight - GAP < headerHeight) {
+              topPosition.value = Math.abs(
+                pageY - (headerHeight + emojiBarHeight + GAP)
+              );
+            }
+            if (pageY + emojiBarHeight + GAP + EXTRA_SPACE > top) {
+              topPosition.value = -(
+                pageY -
+                top +
+                emojiBarHeight +
+                GAP +
+                EXTRA_SPACE
+              );
+            }
           }
         }
       }
     );
 
-    // useDerivedValue(() => {
-    //   const measured = measure(ref);
-    //   if (measured !== null) {
-    //     const { width, height, pageX, pageY } = measured;
-    //     sharedModalPosition.value = { top: pageY, left: pageX, width, height };
-    //     topPosition.value = pageY;
-
-    //     const top = HEIGHT - reactionMenuHeight;
-
-    //     if (pageY - emojiBarHeight - 10 < headerHeight) {
-    //       sharedModalPosition.value.top = withTiming(
-    //         headerHeight + emojiBarHeight + 10
-    //       );
-    //       // topPosition.value = headerHeight + emojiBarHeight + 10;
-    //       runOnJS(settingNewPosition)(
-    //         pageX,
-    //         headerHeight + emojiBarHeight + 10
-    //       );
-    //     }
-    //     if (pageY > top) {
-    //       // topPosition.value = top - EXTRA_SPACE;
-    //       sharedModalPosition.value.top = withTiming(top - EXTRA_SPACE);
-    //       runOnJS(settingNewPosition)(pageX, top - EXTRA_SPACE);
-    //     }
-    //   } else {
-    //     // console.log("measure: could not measure view");
-    //   }
-    // });
-
     const animatedPositionStyle = useAnimatedStyle(() => {
-      // console.log("sharedModalPosition", sharedModalPosition.value);
-      // return sharedModalPosition.value;
       return {
         width: sharedModalPosition.value.width,
         height: sharedModalPosition.value.height,
-        // left: sharedModalPosition.value.translateX,
         transform: [
           {
             translateX: sharedModalPosition.value.translateX,
@@ -175,12 +95,6 @@ const ModalWrapper = forwardRef<Animated.View, ModalWrapperProps>(
       };
     });
 
-    const newAnimatedPostition = useAnimatedStyle(() => {
-      return { top: withTiming(topPosition.value) };
-    });
-
-    const theme = useTheme();
-
     return (
       <Modal
         transparent
@@ -191,32 +105,13 @@ const ModalWrapper = forwardRef<Animated.View, ModalWrapperProps>(
       >
         <TouchableWithoutFeedback onPressOut={onClose}>
           {Platform.OS === "android" ? (
-            <View
-              style={[
-                styles.overlay,
-                { backgroundColor: "rgba(20,20,20,0.9)" },
-              ]}
-            />
+            <View style={[styles.overlay, styles.bg]} />
           ) : (
-            <BlurView
-              style={[
-                StyleSheet.absoluteFillObject,
-                {
-                  backgroundColor: "rgba(20,20,20,0.8)",
-                },
-              ]}
-            />
+            <BlurView style={[StyleSheet.absoluteFillObject, styles.bg]} />
           )}
         </TouchableWithoutFeedback>
 
-        <Animated.View
-          // style={[styles.modalContent, modalPosition, animatedPositionStyle]}
-          style={[
-            styles.modalContent,
-            animatedPositionStyle,
-            // newAnimatedPostition,
-          ]}
-        >
+        <Animated.View style={[styles.modalContent, animatedPositionStyle]}>
           {children}
         </Animated.View>
       </Modal>
@@ -233,6 +128,9 @@ const styles = StyleSheet.create({
     zIndex: 10,
     gap: 10,
     cursor: "auto",
+  },
+  bg: {
+    backgroundColor: "rgba(20,20,20,0.8)",
   },
 });
 

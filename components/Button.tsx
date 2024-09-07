@@ -1,10 +1,4 @@
-import {
-  Pressable,
-  PressableProps,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { Pressable, PressableProps } from "react-native";
 import React, { useState } from "react";
 import Animated, {
   useAnimatedStyle,
@@ -36,9 +30,6 @@ const Button = (props: PressableProps) => {
       style={[animatedStyle, props.style]}
     >
       {props.children}
-      {/* <View>
-        <Animated.View style={animatedStyle}>{props.children}</Animated.View>
-      </View> */}
     </AnimatedPressable>
   );
 };

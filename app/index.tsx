@@ -10,13 +10,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 const USER_ID = `a1b2c3`;
 
-interface RenderItemType {
-  item: CHAT_ITEM;
-  onReaction: () => void;
-  index?: number;
-}
-
-const RenderItem = ({ item }) => {
+const RenderItem = ({ item }: { item: CHAT_ITEM }) => {
   const isEven = item.userId == USER_ID;
 
   const ChatItemRef = useAnimatedRef<Animated.View>();
@@ -34,11 +28,7 @@ const RenderItem = ({ item }) => {
         ref={ChatItemRef}
         isMenuOpen={isMenuOpen}
         setIsMenuOpen={setIsMenuOpen}
-        bubbleData={{
-          item,
-          isEven,
-          setIsMenuOpen,
-        }}
+        isEven={isEven}
       >
         <Bubble item={item} isEven={isEven} setIsMenuOpen={setIsMenuOpen} />
       </ReactionMenu>
@@ -57,9 +47,7 @@ const Chat = () => {
           styles.contentContainerStyle,
           { paddingBottom: bottom },
         ]}
-        renderItem={({ item, index }) => (
-          <RenderItem item={item} index={index} />
-        )}
+        renderItem={({ item }) => <RenderItem item={item} />}
         keyExtractor={(_, i) => i.toString()}
       />
     </GestureHandlerRootView>

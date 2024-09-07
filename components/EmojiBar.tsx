@@ -1,12 +1,10 @@
-import { StyleSheet, Text, View } from "react-native";
 import React from "react";
-import { Ionicons } from "@expo/vector-icons";
+import { StyleSheet, Text } from "react-native";
 import Animated, {
   FadeInDown,
-  FadeInUp,
-  FadeOutUp,
   LinearTransition,
 } from "react-native-reanimated";
+import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "@react-navigation/native";
 
 const EMOJI_DATA = [
@@ -20,36 +18,24 @@ const EMOJI_DATA = [
 
 const EMOJI_HEIGHT = 22;
 
-const EmojiBar = ({ setEmojiBarHeight }) => {
+const EmojiBar = ({
+  setEmojiBarHeight,
+}: {
+  setEmojiBarHeight: (val: number) => void;
+}) => {
   const theme = useTheme();
   return (
     <Animated.View
       onLayout={(e) => setEmojiBarHeight(e.nativeEvent.layout.height)}
-      style={{
-        flexDirection: "row",
-        paddingVertical: 5,
-        paddingHorizontal: 10,
-        backgroundColor: theme.colors.menu,
-        gap: 8,
-        borderRadius: 200,
-        alignItems: "center",
-      }}
+      style={[styles.container, { backgroundColor: theme.colors.menu }]}
     >
       {EMOJI_DATA.map((emoji, i) => (
         <Animated.View
           layout={LinearTransition}
           entering={FadeInDown.delay(i * 50)}
           key={emoji.id}
-          style={{}}
         >
-          <Text
-            style={{
-              fontSize: EMOJI_HEIGHT,
-              textAlignVertical: "center",
-            }}
-          >
-            {emoji.emoji}
-          </Text>
+          <Text style={styles.emojiText}>{emoji.emoji}</Text>
         </Animated.View>
       ))}
       <Animated.View
@@ -68,4 +54,17 @@ const EmojiBar = ({ setEmojiBarHeight }) => {
 
 export default EmojiBar;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  container: {
+    flexDirection: "row",
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    gap: 8,
+    borderRadius: 200,
+    alignItems: "center",
+  },
+  emojiText: {
+    fontSize: EMOJI_HEIGHT,
+    textAlignVertical: "center",
+  },
+});
