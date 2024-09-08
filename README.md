@@ -1,50 +1,43 @@
-# Welcome to your Expo app 👋
+# Reaction Menu Demo
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+This project demonstrates reaction menu for Android and iOS, inspired by the reaction feature in the [Signal app](https://signal.org/). Built using [Expo](https://expo.dev/) and [react-native-reanimated](https://docs.swmansion.com/react-native-reanimated/), this example project showcases how to implement smooth, interactive animations for a reaction menu that can be used in messaging apps.
 
-## Get started
+## Demo
 
-1. Install dependencies
+Check out the reaction menu in action 👇:
 
-   ```bash
-   npm install
-   ```
+| Android                                                                                                                        | iOS                                                                                                                            |
+|--------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------|
+| https://github.com/user-attachments/assets/f3d11fee-1307-4404-8e87-a485b3b8e554                                                | https://github.com/user-attachments/assets/240f095a-8dde-4f19-860c-89484e1a7bf2                                                |
 
-2. Start the app
+## Features
 
-   ```bash
-    npx expo start
-   ```
+- **Cross-Platform Support**: The reaction menu works on both Android and iOS, with platform-specific adjustments to maintain a native feel.
+- **Interactive Bounce Effect**: Clicking on a message triggers a subtle bounce effect to enhance user interaction.
+- **Modal for Reaction Menu**: Modal is used to display the reaction menu on top of everything, ensuring a seamless experience across both platforms. For iOS, the fade effect in the modal smooths out the transition of the blur background, complementing the message bounce effect nicely.
+- **Custom Positioning with Reanimated**: In the modal, I capture the message's position on the screen (using Reanimated’s `measure` function) and display the reaction menu at the exact location, creating the illusion that the message was always there.
+- **Animated Emoji Bar**: The emoji bar appears with a spring-based animation, and each emoji has a slight delay based on its index, providing a fluid and responsive feel.
+- **iOS Blur Effect**: A blur overlay is added as a background for iOS, providing a polished, native appearance.
 
-In the output, you'll find options to open the app in a
+## How It Works
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+- **Bounce Effect**: Upon clicking a message, a bounce effect is triggered using Reanimated. This adds a playful interaction to the messaging experience.
+  
+- **Modal Implementation**: Instead of rendering the reaction menu directly on the screen, I used a modal. The modal captures the position of the message (using `measure` from Reanimated to get the `pageX`, `pageY`, `width`, and `height` of the message). This allows the message to be re-rendered in the same position inside the modal, so it looks like it never left its original location.
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+- **Entering Animations**: The emoji bar and reaction options appear with simple spring-based entering animations. Each emoji is animated with a slight delay to create a staggered appearance, adding a nice flow to the interaction.
 
-## Get a fresh project
+- **Lightweight Animations**: The spring animation is kept light and subtle to avoid excessive visual flair while maintaining an interactive feel. The goal was to strike a balance between responsiveness and simplicity, ensuring the animations are smooth without being distracting.
 
-When you're ready, run:
+- **iOS-Specific Enhancements**: For iOS, a blur effect is added as the modal’s background, which enhances the look and feel of the reaction menu, making it feel more native to the platform.
 
-```bash
-npm run reset-project
-```
+### Note:
+This project is not a standalone library; it's simply a demo or example implementation. However, if you're interested in building a library on top of this code, that would be greatly appreciated! Contributions are welcome—whether it's a bug fix, a new feature, or general improvements. Feel free to submit a pull request (PR) if you would like to contribute.
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Acknowledgments
 
-## Learn more
+- **[Expo](https://expo.dev/)**: For simplifying cross-platform mobile development.
+- **[Reanimated](https://docs.swmansion.com/react-native-reanimated/)**: For powering the animations that make this reaction menu interactive and fluid.
+- **[Expo Blur](https://docs.expo.dev/versions/latest/sdk/blur-view/)**: For adding the iOS-native blur effect.
 
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Feel free to contribute!
