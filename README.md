@@ -6,9 +6,9 @@ This project demonstrates reaction menu for Android and iOS, inspired by the rea
 
 Check out the reaction menu in action 👇:
 
-| Android                                                                                                                        | iOS                                                                                                                            |
+| Android                                                                                                                        | iOS                                                                                                                        |
 |--------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------|
-| https://github.com/user-attachments/assets/f3d11fee-1307-4404-8e87-a485b3b8e554                                                | https://github.com/user-attachments/assets/240f095a-8dde-4f19-860c-89484e1a7bf2                                                |
+|<video src="https://github.com/user-attachments/assets/3c6dd0fa-c833-4404-a9a7-2755e453869c" /> | <video src="https://github.com/user-attachments/assets/ca14d96e-ebe5-451d-8626-91cad4e1294b" /> |
 
 ## Features
 
@@ -23,7 +23,7 @@ Check out the reaction menu in action 👇:
 
 - **Bounce Effect**: Upon clicking a message, a bounce effect is triggered using Reanimated. This adds a playful interaction to the messaging experience.
   
-- **Modal Implementation**: Instead of rendering the reaction menu directly on the screen, I used a modal. The modal captures the position of the message (using `measure` from Reanimated to get the `pageX`, `pageY`, `width`, and `height` of the message). This allows the message to be re-rendered in the same position inside the modal, so it looks like it never left its original location.
+- **Modal Implementation**: Instead of rendering the reaction menu directly on the screen, I used a modal. In modal I capture the position of the message (using `measure` from Reanimated to get the `pageX`, `pageY`, `width`, and `height` of the message). This allows the message to be rendered in the same position inside the modal, so it looks like it never left its original location.
 
 - **Entering Animations**: The emoji bar and reaction options appear with simple spring-based entering animations. Each emoji is animated with a slight delay to create a staggered appearance, adding a nice flow to the interaction.
 
